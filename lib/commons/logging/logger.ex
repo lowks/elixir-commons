@@ -1,4 +1,5 @@
 defmodule Commons.Logging.Logger do
+  @opts_struct "%Commons.Logging.Logger.LoggerOpts"
   @moduledoc """
   This is the logger used for handling all output of
   debugging, informational, or error messages.
@@ -6,29 +7,37 @@ defmodule Commons.Logging.Logger do
   ## Examples
 
   # Log a message
-  iex> Logger.debug "This is a debugging message!"
-  This is a debugging message!
+  iex> #{__MODULE__}.debug "This is a debugging message!"
+  "This is a debugging message!"
   :ok
 
   # Log a message with some custom options
-  iex> Logger.debug "This is a debugging message!", %LoggerOpts{prefix?: true}
-  ==> This is a debugging message!
+  iex> #{__MODULE__}.debug "This is a debugging message!", #{@opts_struct}{prefix?: true}
+  "==> This is a debugging message!"
   :ok
 
-  # Messages which are 
-  iex> Logger.debug "This is a debugging message!", %LoggerOpts{level: :info}
+  # Messages which are below the current logging level are ignored.
+  iex> #{__MODULE__}.debug "This is a debugging message!", #{@opts_struct}{level: :info}
   :ok
 
-  iex> Logger.debug %{key1: "Some data I care about", key2: :foo}
+  # If you provide a non-binary value to the logger, it will pretty print it
+  # for you, and return the object. Use this for easy pipelining and output
+  # of Elixir data.
+  iex> #{__MODULE__}.debug %{key1: "Some data I care about", key2: :foo}
   %{
     :key1 => "Some data I care about",
     :key2 => :foo
   }
-  %{:key1 => "Some data I care about", key2 => :foo}
+  %{:key1 => "Some data I care about", :key2 => :foo}
 
-  iex> Logger.debug %{key1: "Some data I care about", key2: :foo}, %LoggerOpts{pretty?: false}
-  %{:key1 => "Some data I care about", key2 => :foo}
-  %{:key1 => "Some data I care about", key2 => :foo}
+  # You can also provide a custom prefix to create headers for data
+  iex> #{__MODULE__}.debug %{key1: "Some data I care about", key2: :foo}, #{@opts_struct}{prefix: "==== My Data ===="}
+  "==== My Data ===="
+  %{
+    :key1 => "Some data I care about",
+    :key2 => :foo
+  }
+  %{:key1 => "Some data I care about", :key2 => :foo}
   """
   import Commons.Code.Stringify, only: [stringify: 1]
 
@@ -49,9 +58,9 @@ defmodule Commons.Logging.Logger do
   end
 
   @doc """
-  Initialize the logger. If no options are provided, the defaults
-  are used instead. Options can be passed to individual logger calls
-  as well to customize on a per-usage basis, but if not provided, the
+  Initialize the logger with the given set of options. If no options are 
+  provided, the defaults are used instead. Options can be passed to individual 
+  logger calls as well to customize on a per-usage basis, but if not provided, the
   options stored in the logger's state are used.
   """
   def init!(opts \\ %LoggerOpts{}) do
@@ -71,6 +80,14 @@ defmodule Commons.Logging.Logger do
   @doc """
   Set specific logger options. Takes a keyword list of options to set.
   Returns the current set of options after the update.
+
+  ## Example Usage
+
+  iex> #{__MODULE__}.configure(pretty?: false)
+  %Commons.Logging.Logger.LoggerOpts{binaries: :infer, colors?: true,
+  debug: "\\e[22m", error: "\\e[31m", info: "\\e[22m", level: :debug,
+  notice: "\\e[36m", prefix: "==> ", prefix?: false, pretty?: false,
+  warn: "\\e[33m", width: 120}
   """
   @spec configure([{atom, term}]) :: LoggerOpts.t
   def configure([{_, _}|_] = new) do
@@ -104,8 +121,15 @@ defmodule Commons.Logging.Logger do
   def debug(object, opts),
     do: pp(object, :debug, opts)
   @doc """
-  Log an informational message with the provided options, or if a
-  value other than a binary is provided, the value will be pretty printed.
+  Log an informational message.
+
+  If the value provided is not a binary, it will be
+  stringified and pretty printed to the log. If you pass
+  a binary, :ok will be returned. If you pass a non-binary
+  value, the value itself will be returned (for easy pipelining).
+
+  You can pass a `LoggerOpts` struct to configure the output. The
+  default set of options will be used if you don't pass any.
   """
   def info(logging, opts \\ nil)
   def info(message, opts) when is_binary(message),
@@ -113,8 +137,15 @@ defmodule Commons.Logging.Logger do
   def info(object, opts),
     do: pp(object, :info, opts)
   @doc """
-  Log a notice message with the provided options, or if a value other
-  than a binary is provided, the value will be pretty printed.
+  Log a notice message.
+
+  If the value provided is not a binary, it will be
+  stringified and pretty printed to the log. If you pass
+  a binary, :ok will be returned. If you pass a non-binary
+  value, the value itself will be returned (for easy pipelining).
+
+  You can pass a `LoggerOpts` struct to configure the output. The
+  default set of options will be used if you don't pass any.
   """
   def notice(logging, opts \\ nil)
   def notice(message, opts) when is_binary(message),
@@ -122,8 +153,15 @@ defmodule Commons.Logging.Logger do
   def notice(object, opts),
     do: pp(object, :notice, opts)
   @doc """
-  Log a warning message with the provided options, or if a value other
-  than a binary is provided, the value will be pretty printed.
+  Log a warning message.
+
+  If the value provided is not a binary, it will be
+  stringified and pretty printed to the log. If you pass
+  a binary, :ok will be returned. If you pass a non-binary
+  value, the value itself will be returned (for easy pipelining).
+
+  You can pass a `LoggerOpts` struct to configure the output. The
+  default set of options will be used if you don't pass any.
   """
   def warn(logging, opts \\ nil)
   def warn(message, opts) when is_binary(message),
@@ -131,8 +169,15 @@ defmodule Commons.Logging.Logger do
   def warn(object, opts),
     do: pp(object, :warn, opts)
   @doc """
-  Log an error message with the provided options, or if a value other
-  than a binary is provided, the value will be pretty printed.
+  Log an error message.
+  
+  If the value provided is not a binary, it will be
+  stringified and pretty printed to the log. If you pass
+  a binary, :ok will be returned. If you pass a non-binary
+  value, the value itself will be returned (for easy pipelining).
+
+  You can pass a `LoggerOpts` struct to configure the output. The
+  default set of options will be used if you don't pass any.
   """
   def error(logging, opts \\ nil)
   def error(message, opts) when is_binary(message),
@@ -145,7 +190,7 @@ defmodule Commons.Logging.Logger do
     if loggable?(type, opts.level) do
       prefix = opts.prefix? && opts.prefix || ""
       color  = opts[type]
-      IO.puts "#{color}#{prefix}#{message}#{IO.ANSI.reset}"
+      do_log! "#{color}#{prefix}#{message}#{IO.ANSI.reset}"
     else
       :ok
     end
@@ -172,8 +217,8 @@ defmodule Commons.Logging.Logger do
           pp(obj, opts)
       end
       case opts.prefix? do
-        true  -> IO.puts "#{color}#{opts.prefix}\n#{stringified}#{IO.ANSI.reset}"
-        false -> IO.puts "#{color}#{stringified}#{IO.ANSI.reset}"
+        true  -> do_log! "#{color}#{opts.prefix}\n#{stringified}#{IO.ANSI.reset}"
+        false -> do_log! "#{color}#{stringified}#{IO.ANSI.reset}"
       end
     end
     obj
@@ -182,6 +227,20 @@ defmodule Commons.Logging.Logger do
     obj
     |> Inspect.Algebra.to_doc(%Inspect.Opts{binaries: opts.binaries})
     |> Inspect.Algebra.pretty(opts.width)
+  end
+
+  defp do_log!(message) do
+    # When running in the test environment, capture the console output,
+    # and redirect to a new StringIO device.
+    case Mix.env do
+      :test ->
+        {:ok, pid} = StringIO.open("")
+        result = IO.puts pid, message
+        {:ok, {_, _output}} = StringIO.close(pid)
+        result
+      _ ->
+        IO.puts message
+    end
   end
 
   defp loggable?(:debug, level)
