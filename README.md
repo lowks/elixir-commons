@@ -1,5 +1,7 @@
 ## Elixir Commons
 
+[![Build Status](https://travis-ci.org/bitwalker/elixir-commons.svg?branch=master)](https://travis-ci.org/bitwalker/elixir-commons)
+
 ### What is it?
 
 `elixir_commons` started as a collection of useful extensions to the standard library that I've been accumulating across projects. The name itself is inspired by a similar project by Erlware, called [erlware_commons](https://github.com/erlware/erlware_commons). This project is best used as a swiss army knife library that can help eliminate code that tends to get duplicated across projects, as well as form a foundation of well tested code that you can build upon, to better focus on what you are building rather than plumbing.
