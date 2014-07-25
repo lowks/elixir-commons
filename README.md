@@ -29,9 +29,16 @@ This module is for performing general purpose logging during development. It is 
 
 This module is for querying, transforming, manipulating, and stringifying Elixir code and Erlang terms. It also contains functionality for querying metadata about OTP applications, BEAM files, and more will be added. A lot of the drive for code here comes from needs I have in `exrm` and feel would be useful for others as well.
 
-#### System
+#### Macros
 
-This is a TODO, but this module will be used for querying things about the current system, the Elixir and Erlang installations, and potentially more.
+This module provides all macros made available by `elixir_commons`. Currently this consists of a modified `defdelegate/2` which proxies `@doc` and `@spec` attributes to the delegating function, so that you can query docs as if the delegate is the original function. I'm considering adding in a `pipe_last` macro as well, since it's something I personally miss from Clojure - probably will look something like:
+
+```elixir
+def say_hi(message) do
+  message |>> say_hi("Paul", "Schoenfelder")
+end
+def say_hi(first, last, message), do: "Hello, #{first} #{last}", #{message}
+```
 
 ### Contributing
 
