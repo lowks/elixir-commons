@@ -11,12 +11,13 @@ defmodule Commons.Code.Stringify do
   representation of that schema for printing or writing
   to disk.
   """
-  def stringify(schema) do
+  @spec stringify(term) :: binary
+  def stringify(obj) do
     # Use an agent to store indentation level
     Agent.start_link(fn -> 0 end, name: __MODULE__)
     reset_indent!
     # Walk the syntax tree and transform each node into a string
-    schema
+    obj
     |> Macro.postwalk([], fn ast, _node -> {ast, []} end)
     |> elem(0)
     |> do_stringify
