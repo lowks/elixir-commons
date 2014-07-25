@@ -59,7 +59,7 @@ defmodule Commons.Macros.Defdelegate do
     do: true
   defp find_function_docs(_, _, {{_, _}, _, _, _, _}),
     do: false
-  defp extract_function_doc({{f, _arity}, _line, _type, _args, doc}), do: doc
+  defp extract_function_doc({{_fun, _arity}, _line, _type, _args, doc}), do: doc
 
   def get_function_specs(mod, fun, arity) when is_atom(mod) and is_atom(fun) do
     case beam_specs(mod) do
@@ -67,14 +67,13 @@ defmodule Commons.Macros.Defdelegate do
       specs ->
         result = Enum.find(specs, &(find_function_spec(fun, arity, &1)))
         result && extract_function_spec(result) || []
-        #result && extract_function_spec(result) || []
     end
   end
   defp find_function_spec(fun, arity, {:spec, {{fun, arity}, _spec}}),
     do: true
   defp find_function_spec(_, _, {_, {{_, _}, _}}),
     do: false
-  defp extract_function_spec({kind, {{fun, _arity}, spec}}) do
+  defp extract_function_spec({_kind, {{fun, _arity}, spec}}) do
     Enum.map(spec, fn s ->
       Kernel.Typespec.spec_to_ast(fun, s)
     end)
