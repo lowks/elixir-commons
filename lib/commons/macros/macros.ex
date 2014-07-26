@@ -19,6 +19,7 @@ defmodule Commons.Macros do
   defmacro __using__(_) do
     quote do
       import Kernel, except: [defdelegate: 2]
+      require Commons.Macros.Defdelegate
       import Commons.Macros.Defdelegate, only: [defdelegate: 2]
     end
   end
