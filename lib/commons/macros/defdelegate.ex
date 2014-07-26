@@ -11,41 +11,6 @@ defmodule Commons.Macros.Defdelegate do
   defmacro defdelegate(funs, opts) do
     funs = Macro.escape(funs, unquote: true)
 
-    # target = Keyword.get(opts, :to) ||
-    #   raise ArgumentError, "Expected to: to be given as argument"
-    # expanded = target |> Macro.expand(__CALLER__)
-
-    # #IO.inspect :elixir_module.docs_table(:"Elixir.#{expanded}")
-
-    # append_first = Keyword.get(opts, :append_first, false)
-
-    # for fun <- List.wrap(funs) do
-    #   {name, args} = case Macro.decompose_call(fun) do
-    #     {_, _} = pair -> pair
-    #     _ -> raise ArgumentError, "invalid syntax in defdelegate #{Macro.to_string(fun)}"
-    #   end
-
-    #   actual_args = case append_first and args != [] do
-    #     true  -> tl(args) ++ [hd(args)]
-    #     false -> args
-    #   end
-
-    #   fun      = Keyword.get(opts, :as, name)
-    #   arity    = length(actual_args)
-    #   doc      = Commons.Macros.Defdelegate.get_function_docs(expanded, fun, arity)
-    #   specs    = Commons.Macros.Defdelegate.get_function_specs(expanded, fun, arity)
-
-    #   quote do
-    #     @doc unquote(doc)
-    #     for spec <- unquote(specs) do
-    #       @spec spec
-    #     end
-    #     def unquote(name)(unquote_splicing(args)) do
-    #       unquote(target).unquote(fun)(unquote_splicing(actual_args))
-    #     end
-    #   end
-    # end
-
     quote bind_quoted: [funs: funs, opts: opts] do
       target = Keyword.get(opts, :to) ||
         raise ArgumentError, "Expected to: to be given as argument"
