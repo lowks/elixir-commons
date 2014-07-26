@@ -1,8 +1,6 @@
 defmodule Commons.Code.Stringify do
   @moduledoc """
-  This module provides handy utilities for low-level
-  manipulation of Elixir's AST. Currently, it's primary
-  purpose is for stringification of Elixir data structures
+  This module is for stringification of Elixir data structures
   for printing or writing to disk.
   """
 
