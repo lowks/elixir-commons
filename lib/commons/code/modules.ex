@@ -11,14 +11,20 @@ defmodule Commons.Code.Modules do
   """
   @spec load_object_code(atom) :: binary
   def load_object_code(mod) when is_atom(mod) do
-    case :code.get_object_code(mod) do
-      {_module, beam, _beam_path} ->
-        beam
-      :error ->
-        {:module, ^mod}      = Code.ensure_compiled(mod)
-        {:file, module_path} = :code.is_loaded(mod)
-        [{^mod, module_bin}] = Code.load_file("#{module_path}")
-        module_bin
+    case load_cached_beam!(mod) do
+      nil ->
+        case :code.get_object_code(mod) do
+          {_module, beam, _beam_path} ->
+            cache_beam!(mod, beam)
+            beam
+          :error ->
+            {:module, ^mod}      = Code.ensure_compiled(mod)
+            {:file, module_path} = :code.is_loaded(mod)
+            [{^mod, beam}] = Code.load_file("#{module_path}")
+            cache_beam!(mod, beam)
+            beam
+        end
+      beam -> beam
     end
   end
 
@@ -157,6 +163,27 @@ defmodule Commons.Code.Modules do
   defp beam_specs_tag(nil, _), do: nil
   defp beam_specs_tag(specs, tag) do
     Enum.map(specs, &{tag, &1})
+  end
+
+  defp load_cached_beam!(mod) do
+    ensure_started!
+    Agent.get(__MODULE__, fn cache ->
+      get_in cache, [mod]
+    end)
+  end
+
+  defp cache_beam!(mod, obj) do
+    ensure_started!
+    Agent.cast(__MODULE__, fn cache ->
+      put_in cache, [mod], obj
+    end)
+  end
+
+  defp ensure_started! do
+    case Agent.start_link(fn -> %{} end, name: __MODULE__) do
+      {:ok, pid}                        -> pid
+      {:error, {:already_started, pid}} -> pid
+    end
   end
 
 end
