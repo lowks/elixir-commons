@@ -34,15 +34,15 @@ defmodule Commons.Code.Modules do
   """
   @spec from_abstract_code(atom, atom) :: [term] | nil
   def from_abstract_code(module, kind) when is_atom(module) and is_atom(kind) do
-    get_abstract_code(module) |> do_from_abstract_code
+    get_abstract_code(module) |> do_from_abstract_code(kind)
   end
   def from_abstract_code(beam, kind) when is_binary(beam) and is_atom(kind) do
-    get_abstract_code(beam) |> do_from_abstract_code
+    get_abstract_code(beam) |> do_from_abstract_code(kind)
   end
-  defp do_from_abstract_code({:ok, abstract_code}, kind) do
+  defp do_from_abstract_code(abstract_code, kind) when is_list(abstract_code) do
     for {:attribute, _, abs_kind, value} <- abstract_code, kind == abs_kind, do: value
   end
-  defp do_from_abstract_code(_), do: nil
+  defp do_from_abstract_code(_, _), do: nil
 
 
   @doc """
