@@ -11,7 +11,6 @@ defmodule CommonsMacroTest do
       representation of that schema for printing or writing
       to disk.
 
-
       """
   
     assert capture_io(fn ->

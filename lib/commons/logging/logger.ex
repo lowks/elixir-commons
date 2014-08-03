@@ -226,7 +226,7 @@ defmodule Commons.Logging.Logger do
   def pp(obj, opts) do
     obj
     |> Inspect.Algebra.to_doc(%Inspect.Opts{binaries: opts.binaries})
-    |> Inspect.Algebra.pretty(opts.width)
+    |> Inspect.Algebra.format(opts.width)
   end
 
   defp do_log!(message) do
