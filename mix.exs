@@ -4,7 +4,7 @@ defmodule Commons.Mixfile do
   def project do
     [app: :elixir_commons,
      version: "0.0.2",
-     elixir: "~> 0.15.0",
+     elixir: "~> 0.15.1",
      deps: deps]
   end
 
