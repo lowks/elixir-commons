@@ -18,11 +18,19 @@ defmodule Commons.Code.Modules do
             cache_beam!(mod, beam)
             beam
           :error ->
-            {:module, ^mod}      = Code.ensure_compiled(mod)
-            {:file, module_path} = :code.is_loaded(mod)
-            [{^mod, beam}] = Code.load_file("#{module_path}")
-            cache_beam!(mod, beam)
-            beam
+            {:module, ^mod} = Code.ensure_compiled(mod)
+            compile_attrs   = mod.__info__(:compile)
+            source          = Keyword.get(compile_attrs, :source)
+            case :code.is_loaded(mod) do
+              {:file, :in_memory} ->
+                [{^mod, beam}] = Code.load_file("#{source}")
+                cache_beam!(mod, beam)
+                beam
+              {:file, module_path} ->
+                [{^mod, beam}] = Code.load_file("#{module_path}")
+                cache_beam!(mod, beam)
+                beam
+            end
         end
       beam -> beam
     end
